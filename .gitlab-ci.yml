@@ -1,0 +1,6 @@
+test:
+  image: inhumantsar/ansible
+  variables:
+    WORKDIR: "$CI_PROJECT_DIR"
+  script:
+    - /start.sh

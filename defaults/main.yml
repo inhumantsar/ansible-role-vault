@@ -1,0 +1,14 @@
+---
+service_env: "dev"
+service_name: "vault"
+service_state: "present"
+
+vault_port: "8200"
+vault_datapath: "/srv/vault/data"
+vault_image: "vault"
+vault_image_tag: "latest"
+vault_root_token: "somethingrandom"
+vault_config:
+  storage:
+    file: 
+      path: /vault/file

@@ -1,0 +1,53 @@
+---
+# tasks file for docker-compose-vault
+- debug: msg="Starting tasks from docker-compose-vault..."
+
+# vars/main.yml is auto-imported.
+- name: Import env-sensitive overrides
+  include_vars: "vars/{{ service_env }}.yml"
+  when: service_env != "dev"
+
+# easy pre-reqs
+- name: Ensure the docker libs are installed.
+  pip:
+    name: docker
+    version: 2.3.0
+- name: Ensure docker-compose libs are installed
+  pip:
+    name: docker-compose
+
+- name: create config dir because vault's start script doesn't bother.
+  file:
+    path: "{{ vault_datapath }}/config"
+    state: directory
+
+# do the thing
+- name: Launch services with docker-compose.yml
+  docker_service:
+    state: "{{ service_state }}"
+    project_name: "{{ service_env }}_{{ service_name }}"
+    definition:
+      version: "2"
+      services:
+        vault:
+          image: "{{ vault_image }}:{{ vault_image_tag }}"
+          container_name: "{{ service_env }}_{{ service_name }}_vault"
+          cap_add:
+            - IPC_LOCK
+          ports:
+           - "{{ vault_port }}:8200"
+          volumes:
+           - "{{ vault_datapath }}:/vault"
+          environment:
+            - "VAULT_LOCAL_CONFIG={{ vault_config | to_json }}"
+          restart: always
+  register: output
+
+- debug: var=output
+
+# inline unit testing
+- name: Confirm services launched successfully
+  assert:
+    that:
+      - "vault.{{ service_env }}_{{ service_name }}_vault.state.running"
+  when: service_state == "present"
