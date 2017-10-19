@@ -6,5 +6,23 @@
   vars_files:
     - 'defaults/main.yml'
     - 'vars/main.yml'
+  environment:
+    VAULT_TOKEN: somethingbigandrandom
+    VAULT_ADDR: http://localhost:8200
+    VAULT_SKIP_VERIFY: True
   tasks:
     - include_tasks: 'tasks/main.yml'
+
+    - name: write secrets
+      hashivault_write:
+        secret: 'bigfancy'
+        data:
+          cantuse: alist
+          only: dicts
+
+    - name: list secrets
+      hashivault_list:
+        secret: 'bigfancy'
+
+    - name: try a lookup
+      debug: var="{{ lookup('hashivault', 'bigfancy', 'cantuse') }}"

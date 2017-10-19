@@ -39,6 +39,7 @@
           volumes:
            - "{{ vault_datapath }}:/vault"
           environment:
+            - "VAULT_DEV_ROOT_TOKEN_ID={{ vault_dev_root_token }}"
             - "VAULT_LOCAL_CONFIG={{ vault_config | to_json }}"
           restart: always
   register: output
