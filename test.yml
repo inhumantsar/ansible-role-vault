@@ -1,5 +1,6 @@
 - hosts: localhost
   connection: local
+  become: true
   handlers:
     - include: 'handlers/main.yml'
   vars_files:
